@@ -1,0 +1,103 @@
+﻿<Window x:Class="DrawingTools.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DrawingTools"
+        mc:Ignorable="d"
+        Title="DrawingTools" WindowStyle="ToolWindow" Height="350" Width="170" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+    <Grid >
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Выбор среды (пользовательские атрибуты) -->
+        <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" IsEnabled="false" Margin="5,2.5,5,0" VerticalAlignment="Top">
+            <ComboBoxItem IsSelected="True">SteelDetailing.ru</ComboBoxItem>
+            <ComboBoxItem>Russia</ComboBoxItem>
+            <ComboBoxItem>Topengineer</ComboBoxItem>
+        </ComboBox>
+
+        <!-- Смена формата чертежа -->
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch" Margin="5,2.5,5,2.5" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <!-- Смена типа формата -->
+            <Button Grid.Column="0" Grid.Row="0" Margin="0,6,0,25" Height="20" Width="20" Content="↑" Name="chUP"  Click="chUP_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Button Grid.Column="0" Grid.Row="0" Margin="0,26,0,0" Height="20" Width="20" Content="↓" Name="chDOWN" Click="chDOWN_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <!-- Функция смены формата -->
+            <Button Grid.Column="1" Height="50" Margin="5,0,0,0" Width="125" Name="chOk" Click="ChOk_Click"/>
+            <!-- Расширение формата-->
+            <Button Grid.Column="1" Grid.Row="1" Margin="-40,4,5,0" Height="20" Width="20" Content="←" Name="chLEFT" Click="chLEFT_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Grid.Row="1" Margin="0,4,0,0" Height="20" Width="20" Content="→" Name="chRIGHT" Click="chRIGHT_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Grid.Row="1" Margin="40,4,-5,0" Height="20" Width="20" Content="↻" Name="chREVERSE" Click="chREVERSE_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Операции с размерами -->
+        <Grid Grid.Row="2" HorizontalAlignment="Stretch"  Margin="0,0,0,0" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Тип размера -->
+            <Button Grid.Column="0" Grid.Row="0" Height="30" Width="30" Name="dimRelative" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimRelative_Click">
+                <Image Source="Resources/bRELATIVE.bmp" />
+            </Button>
+            <Button Grid.Column="1" Grid.Row="0" Height="30" Width="30" Name="dimABSOLUTE" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimABSOLUTE_Click">
+                <Image Source="Resources/bABSOLUTE.bmp" />
+            </Button>
+            <Button Grid.Column="2" Grid.Row="0" Height="30" Width="30" Name="dimMIXED" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimMIXED_Click">
+                <Image Source="Resources/bMixed.bmp"  />
+            </Button>
+            <Button Grid.Column="3" Grid.Row="0" Height="30" Width="30" Name="dimInsideDimension" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimInsideDimension_Click">
+                <Image Source="Resources/bInsideDimension.bmp"  />
+            </Button>
+            <!-- Точность размера -->
+            <Button Grid.Column="0" Grid.Row="1" Height="30" Margin="0,2.5,0,2.5" Width="30" Name="dimAccuracy1" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimAccuracy1_Click">
+                <Image Source="Resources/bACC_1.bmp" />
+            </Button>
+            <Button Grid.Column="1" Grid.Row="1" Height="30" Margin="0,2.5,0,2.5" Width="30" Name="dimAccuracy05" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimAccuracy05_Click" >
+                <Image Source="Resources/bACC_0.5.bmp" />
+            </Button>
+            <Button Grid.Column="2" Grid.Row="1" Height="30" Margin="0,2.5,0,2.5" Width="30" Name="dimAccuracy01" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimAccuracy01_Click" >
+                <Image Source="Resources/bACC_0.1.bmp" />
+            </Button>
+            <Button Grid.Column="3" Grid.Row="1" Height="30" Margin="0,2.5,0,2.5" Width="30" Name="dimAccuracy001" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimAccuracy001_Click">
+                <Image Source="Resources/bACC_0.001.bmp" />
+            </Button>
+            <!-- Угловой размер -->
+            <TextBox Grid.Column="0" Grid.Row="2" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center" FontStretch="UltraExpanded" >
+               1000
+            </TextBox>
+            <Button Grid.Column="1" Grid.Row="2" Height="30" Margin="0,2.5,0,2.5" Width="30"  HorizontalAlignment="Center" VerticalAlignment="Center" Click="" >
+                <Image Source="Resources/BTRIANGLE.bmp" />
+            </Button>
+            <Button Grid.Column="2" Grid.Row="2" Height="30" Margin="0,2.5,0,2.5" Width="30" HorizontalAlignment="Center" VerticalAlignment="Center" Click="" >
+                <Image Source="Resources/bANGLE_PLACE.bmp" />
+            </Button>
+            <Button Grid.Column="3" Grid.Row="2" Height="30" Margin="0,2.5,0,2.5" Width="30" HorizontalAlignment="Center" VerticalAlignment="Center" Click="">
+                <Image Source="Resources/bANGLE.bmp" />
+            </Button>
+            
+        </Grid>
+    </Grid>
+</Window>
