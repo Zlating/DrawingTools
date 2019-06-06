@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -9,13 +10,16 @@ using Tekla.Structures;
 using Tekla.Structures.Drawing;
 
 using ui = Tekla.Structures.Drawing.UI;
+using tsg = Tekla.Structures.Geometry3d;
+using tsm = Tekla.Structures.Model;
+using System.Collections;
 
 namespace DrawingTools
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class UI : Window
     {
 
         DrawingHandler dh = new DrawingHandler();
@@ -32,14 +36,22 @@ namespace DrawingTools
             }
         }
 
-        public MainWindow()
+
+        private void CommitChanges()
+        {
+            draw.CommitChanges();
+        }
+
+        public UI()
         {
             InitializeComponent();
+
+            
 
             // Инициализация смены формата
             chOk.FontSize = 16;
             vChangeFormat();
-            bScaleSlider.Value = 5;
+            //bScaleSlider.Value = 5;
 
             dicScales.Add(new arkScales(1, 26));
 
@@ -48,7 +60,28 @@ namespace DrawingTools
                 dicScales.Add(new arkScales(i * 25 - 1, (i*25)+25+1));
             }
 
+            List<string> styles = new List<string> { "light", "dark" };
+            SetUpThemeApp(styles[0]);
 
+            string env = SettingsEnvironment.GetEnvironmentModel.Trim().Replace(".","");
+            
+            if (env == "")
+            {
+                env = cenv.SelectedItem.ToString();
+            }
+            SettingsEnvironment.Init(env);
+           foreach(var v in cenv.Items)
+            {
+                ComboBoxItem cbi = v as ComboBoxItem;
+                if (cbi.Name == env)
+                {
+                    //cenv.SelectedItem = cbi;
+                    break;
+                }
+            }
+
+            DrawingHandler.SetMessageExecutionStatus(DrawingHandler.MessageExecutionModeEnum.BY_COMMIT);
+            this.Title = "DrawingTools v" + Assembly.GetExecutingAssembly().GetName().Version;
         }
         #region Смена формата 
 
@@ -149,6 +182,7 @@ namespace DrawingTools
                 sds.Modify();
             }
             }
+            CommitChanges();
         }
 
         private void DimMIXED_Click(object sender, RoutedEventArgs e) => ChangeDimensionType(3);
@@ -183,6 +217,7 @@ namespace DrawingTools
                     sds.Modify();
                 }
             }
+            CommitChanges();
         }
 
         private void DimAccuracy05_Click(object sender, RoutedEventArgs e) => ChangeAccuracy(2);
@@ -231,6 +266,7 @@ namespace DrawingTools
                     sds.Modify();
                 }
             }
+            CommitChanges();
         }
 
         private void BaseAngle_KeyDown(object sender, System.Windows.Input.KeyEventArgs e) => chTriangle_running();
@@ -241,58 +277,118 @@ namespace DrawingTools
 
         #endregion
         #region Префикс\Постфикс размеров
-        private void TPrefix_KeyUp(object sender, System.Windows.Input.KeyEventArgs e) => chPrefixPostfix(0, tPrefix.Text);
+        private void TPrefix_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                chPrefixPostfix(0, tPrefix.Text);
+            }
+        }
 
-        private void TPostfix_KeyUp(object sender, System.Windows.Input.KeyEventArgs e) => chPrefixPostfix(1, tPostfix.Text);
+        private void TPostfix_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                chPrefixPostfix(1, tPostfix.Text);
+            }
+        }
 
         private void chPrefixPostfix(int type, string text)
         {
-
-            MessageBox.Show("Disconnected");
-            return;
-
             DrawingObjectEnumerator does = SelectedObjects;
             while (does.MoveNext())
             {
                 DrawingObject dobj = does.Current;
+
                 if (dobj.GetType() == typeof(StraightDimensionSet))
                 {
                     StraightDimensionSet sds = dobj as StraightDimensionSet;
                     DrawingObjectEnumerator dimensions = sds.GetObjects();
                     while (dimensions.MoveNext())
                     {
-                        try
-                        {
-                            StraightDimension sd = dimensions.Current as StraightDimension;
-
-                            ContainerElement ce = null;
-
-                            TextElement te = new TextElement(text);
-                            te.Font = sds.Attributes.Text.Font;
-                            if (type == 0)
-                            {
-                                ce = sd.Attributes.DimensionValuePrefix;
-                                ce.Clear();
-                                ce.Add(te);
-                            }
-                            else
-                            {
-                                ce = sd.Attributes.DimensionValuePostfix;
-                                ce.Clear();
-                                ce.Add(te);
-                            }
-                            double dist = sd.Distance;
-                            var vector = new Tekla.Structures.Geometry3d.Vector(sd.UpDirection.X, sd.UpDirection.Y, sd.UpDirection.Z);
-#warning Размер улетает после его модификации!
-                            sd.Modify();
-                          
-                            sd.UpDirection = vector;
-                            sd.Modify();
-                        }
-                        catch { }
+                        chPrefixPostfix(dimensions.Current as StraightDimension, text, type);
                     }
                 }
+                else if (dobj.GetType() == typeof(StraightDimension))
+                {
+                    chPrefixPostfix(dobj as StraightDimension, text, type);
+                }
             }
+            CommitChanges();
+        }
+
+
+        private void chPrefixPostfix(StraightDimension sd, string text, int type)
+        {
+
+            ui.DrawingObjectSelector dos = dh.GetDrawingObjectSelector();
+            dos.UnselectAllObjects();
+            dos.SelectObject(sd);
+
+            string[] lines = text.Split(new char[] { '/' });
+
+            ContainerElement ce = new ContainerElement();
+
+            TextElement te = new TextElement("");
+            te.Font = sd.GetDimensionSet().Attributes.Text.Font;
+            te.Font.Height = sd.GetDimensionSet().Attributes.Text.Font.Height - 1;
+
+         
+            DrawingObjectEnumerator related = sd.GetRelatedObjects(new Type[] { typeof(Bolt) });
+
+            bool bolt = related.GetSize() > 0 ? true : false;
+
+
+            TeklaStructures.Connect();
+            MacroBuilder akit = new MacroBuilder();
+            akit.Callback("acmd_display_selected_drawing_object_dialog", "", "View_10 window_1");
+            akit.TabChange("dim_dial", "tabWndDimAttrib", "tabMarks");
+
+            string itype = type == 0 ? "prefix" : "postfix";
+
+            int count = (type == 0 ? 
+                sd.Attributes.DimensionValuePrefix.Count : sd.Attributes.DimensionValuePostfix.Count);
+            if (type == 0)
+            {
+                akit.PushButton($"butPrefixMark", "dim_dial");
+            }
+            else
+            {
+                akit.PushButton($"butPostfixMark", "dim_dial");
+            }
+            for (int i = 1; i <= 100; i++)
+            {
+                akit.TableSelect($"dim_{itype}_mark_dial", "gr_mark_selected_elements", new int[] { 1 });
+                akit.PushButton("gr_remove_element", $"dim_{itype}_mark_dial");
+            }
+           
+
+           
+            for (int i = 0; i < lines.Length; i++)
+            {
+                for (int k = 0; k < 3; k++)
+                {
+                    akit.TableSelect($"dim_{itype}_mark_dial", "gr_mark_elements", new int[] { bolt == true ? 22 : 19 });
+                    akit.Activate($"dim_{itype}_mark_dial", "gr_mark_elements");
+                }
+                akit.TableSelect($"dim_{itype}_mark_dial", "gr_mark_elements", new int[] { bolt == true ? 18 : 15 });
+                akit.Activate($"dim_{itype}_mark_dial", "gr_mark_elements");
+                akit.ValueChange("gr_mark_text", "gr_text", lines[i]);
+                akit.PushButton("gr_mark_prompt_ok", "gr_mark_text");
+                akit.TableSelect($"dim_{itype}_mark_dial", "gr_mark_elements", new int[] { bolt == true ? 21 : 18 });
+                akit.Activate($"dim_{itype}_mark_dial", "gr_mark_elements");
+            }
+            for (int i = 1; i <= lines.Length * 6; i++)
+            {
+                akit.TableSelect($"dim_{itype}_mark_dial", "gr_mark_selected_elements", new int[] { i });
+                akit.ValueChange($"dim_{itype}_mark_dial", "height", te.Font.Height.ToString().Replace(",","."));
+            }
+
+            akit.PushButton("butModify", $"dim_{itype}_mark_dial");
+            akit.PushButton("butOk", $"dim_{itype}_mark_dial");
+            akit.PushButton("dim_cancel", "dim_dial");
+            akit.Run();
+            CommitChanges();
         }
 
         private void BPrefix_Click(object sender, RoutedEventArgs e) => chPrefixPostfix(0, tPrefix.Text);
@@ -302,7 +398,18 @@ namespace DrawingTools
 
         #region Свойства вида
 
-        private void BScale_Click(object sender, RoutedEventArgs e)
+        private void BLevelLow_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BLevelHigh_Click(object sender, RoutedEventArgs e)
+        {
+            changeLevelView(tLevelHigh.Text);
+        }
+
+
+        private void changeLevelView(string val)
         {
             DrawingObjectEnumerator does = SelectedObjects;
             while (does.MoveNext())
@@ -310,14 +417,67 @@ namespace DrawingTools
                 DrawingObject dobj = does.Current;
                 if (dobj.GetType() == typeof(View))
                 {
-                    View v = dobj as View;
-                    v.Attributes.Scale = Convert.ToDouble(bScaleSlider.Value);
-                    v.Modify();
+                    try
+                    {
+                        View v = dobj as View;
+                        ui.DrawingObjectSelector dos = dh.GetDrawingObjectSelector();
+                        dos.UnselectAllObjects();
+                        dos.SelectObject(dobj);
+                        Tekla.Structures.TeklaStructures.Connect();
+                        MacroBuilder akit = new MacroBuilder();
+
+                        val += "/";
+                        string[] value = val.Split(new char[] { '/' });
+
+                        //MessageBox.Show(value.Length.ToString());
+
+                        akit.Callback("acmd_display_selected_drawing_object_dialog", "", "View_10 window_1");
+                        if (value[0].Trim() != "")
+                        {
+                            akit.ValueChange("view_dial", "gr_view_depth_pos", value[0]);
+                        }
+                        if (value[1].Trim() != "")
+                        {
+                            akit.ValueChange("view_dial", "gr_view_depth_neg", value[1]);
+                        }
+
+                        akit.PushButton("view_modify", "view_dial");
+                        akit.PushButton("view_cancel", "view_dial");
+                        akit.Run();
+
+                    }
+                    catch { }
                 }
             }
-
-           
+            CommitChanges();
         }
+
+
+        private void BScale_Click(object sender, RoutedEventArgs e)
+        {
+            ChangeScale();
+        }
+
+        void ChangeScale()
+        {
+            DrawingObjectEnumerator does = SelectedObjects;
+            while (does.MoveNext())
+            {
+                DrawingObject dobj = does.Current;
+                if (dobj.GetType() == typeof(View))
+                {
+                    try
+                    {
+                        View v = dobj as View;
+                        v.Attributes.Scale = Convert.ToDouble(bScaleText.Text); //Convert.ToDouble(bScaleSlider.Value);
+                        v.Modify();
+                    }
+                    catch { }
+                }
+            }
+            CommitChanges();
+        }
+
 
         List<arkScales> dicScales = new List<arkScales>();
 
@@ -332,46 +492,17 @@ namespace DrawingTools
             }
         }
 
-        private void BSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void BScaleText_TextChanged(object sender, TextChangedEventArgs e)
         {
-            double val = e.NewValue;
-
-            if (val != 1)
-            {
-                if (val == bScaleSlider.Minimum)
-                {
-                    for (int i = 0; i < dicScales.Count; i++)
-                    {
-                        //
-                        if (dicScales[i].min == val)
-                        {
-                            bScaleSlider.Minimum = dicScales[i - 1].min;
-                            bScaleSlider.Maximum = dicScales[i - 1].max;
-                        }
-
-                    }
-                }
-                if (val == bScaleSlider.Maximum)
-                {
-                    for (int i = dicScales.Count - 2; i >= 0; i--)
-                    {
-                        //
-                        if (dicScales[i].max == val)
-                        {
-                            bScaleSlider.Minimum = dicScales[i + 1].min;
-                            bScaleSlider.Maximum = dicScales[i + 1].max;
-                        }
-
-                    }
-                }
-            }
-            bScale.Content = $"М 1:{(int)e.NewValue}";
+            bScale.Content = $"М 1:{bScaleText.Text}";
         }
 
-        private void BScaleSlider_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        private void BScaleText_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            bScaleSlider.Value += (e.Delta > 0) ? 1 : -1;
-
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                ChangeScale();
+            }
         }
 
         private void BTruncation_Click(object sender, RoutedEventArgs e) => Truncation(Convert.ToDouble(tTrunc.Text));
@@ -403,6 +534,7 @@ namespace DrawingTools
                     v.Modify();
                 }
             }
+            CommitChanges();
         }
 
         private void BWS_Click(object sender, RoutedEventArgs e) => bWeld(1);
@@ -426,17 +558,21 @@ namespace DrawingTools
                     dos.SelectObject(dobj);
                     Tekla.Structures.TeklaStructures.Connect();
                     MacroBuilder akit = new MacroBuilder();
-
-                    akit.TreeSelect("view_dial", "gratCastUnitDrawingAttributesMenuTree", "Сварной шов");
-                    akit.ValueChange("view_dial", "WeldVisibility", type.ToString());
+                    akit.Callback("acmd_display_selected_drawing_object_dialog", "", "View_10 window_1");
+                    akit.TreeSelect("view_dial", "gratCastUnitDrawingAttributesMenuTree", "Метка сварного шва");
+                    akit.ValueChange("view_dial", "gr_vwel_create", type.ToString());
+                    //akit.Callback("acmd_display_selected_drawing_object_dialog", "", "View_10 window_1");
+                    //akit.TreeSelect("view_dial", "gratCastUnitDrawingAttributesMenuTree", "Сварной шов");
+                    //akit.ValueChange("view_dial", "WeldVisibility", type.ToString());
                     akit.PushButton("view_modify", "view_dial");
                     akit.PushButton("view_cancel", "view_dial");
                     akit.Run();
 
-                    dos.UnselectAllObjects();
+                    //dos.UnselectAllObjects();
 
                 }
             }
+            CommitChanges();
         }
 
 
@@ -465,6 +601,7 @@ namespace DrawingTools
                     part.Modify();
                 }
             }
+            CommitChanges();
         }
 
         private void Pc1_Click(object sender, RoutedEventArgs e)
@@ -493,18 +630,268 @@ namespace DrawingTools
                     part.Modify();
                 }
             }
+            CommitChanges();
         }
 
         #endregion
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+
+            //Fusion.ho
+
             DrawingObjectEnumerator does = SelectedObjects;
             while (does.MoveNext())
             {
                 DrawingObject dobj = does.Current;
                 MessageBox.Show(dobj.GetType().ToString());
             }
+
+
+            Dictionary<List<string>, List<string>> dic = new Dictionary<List<string>, List<string>>();
+            // Стандарт качества
+            foreach(KeyValuePair<List<string>, List<string>> keys in dic)
+            {
+                List<string> k = keys.Key;
+                List<string> v = keys.Value;
+            }
+            // Var
+            foreach(var k in dic)
+            {
+                var key = k.Key;
+                var val = k.Value;
+            }
         }
+
+        private void ThemeChange(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        bool b = false;
+        private void SetUpThemeApp(string s = "")
+        {
+            string style = s == "" ? (b == false ? "light" : "dark") : s;
+            var uri = new Uri("Resources/" + style + ".xaml", UriKind.Relative);
+            ResourceDictionary resourceDict = Application.LoadComponent(uri) as ResourceDictionary;
+            Application.Current.Resources.Clear();
+            Application.Current.Resources.MergedDictionaries.Add(resourceDict);
+            b = !b;
+        }
+
+
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            
+
+        }
+
+        private void Theme_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BSectionText_Click(object sender, RoutedEventArgs e)
+        {
+            DrawingObjectEnumerator does = SelectedObjects;
+            while (does.MoveNext())
+            {
+                DrawingObject dobj = does.Current;
+                if (dobj.GetType() == typeof(SectionMark))
+                {
+                    SectionMark sm = dobj as SectionMark;
+
+                    var p1 = sm.LeftPoint;
+                    var p2 = sm.RightPoint;
+
+                    Tekla.Structures.Geometry3d.Vector v = new Tekla.Structures.Geometry3d.Vector(p2.X - p1.X, p2.Y - p1.Y, p2.Z - p1.Z);
+
+                    double vx = Math.Round(v.X, 0);
+                    double vy = Math.Round(v.Y, 0);
+                    //MessageBox.Show(v.ToString());
+
+                    double y = SettingsEnvironment.MARK_SECTION[1];
+                    double line_section = SettingsEnvironment.MARK_SECTION[2];
+                    double x = SettingsEnvironment.MARK_SECTION[0];
+                    double line_secion_x = SettingsEnvironment.MARK_SECTION[3];
+
+                    string text = tSectionText.Text;
+                    int count = text.Length;
+                    if (text.Contains(" "))
+                    {
+                        count--;
+                    }
+
+                    if (vy == 0)
+                    {
+                        x = x + x / 3 * (count - 1);
+                        line_secion_x = line_secion_x + (line_secion_x / 4) * (count - 1);
+                    }
+                    else
+                    {
+                        y = y + 0.5 * (count - 1);
+                        line_section = line_section +((line_section / 4) * (count - 1)) + 0.25;
+                       
+                    }
+                    sm.Attributes.LeftSymbol.Position.Y = y;
+                    sm.Attributes.RightSymbol.Position.Y = y;
+                    sm.Attributes.LineLengthOffset = line_section;
+                    sm.Attributes.LeftSymbol.Position.X = x;
+                    sm.Attributes.RightSymbol.Position.X = -1 * x;
+                    sm.Attributes.LineWidthOffsetLeft = line_secion_x;
+                    sm.Attributes.LineWidthOffsetRight = line_secion_x;
+                    sm.Attributes.MarkName = text;
+                    sm.Modify();
+                }
+            }
+            CommitChanges();
+        }
+
+        private void Cenv_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string env = (cenv.SelectedItem as ComboBoxItem).Name;
+            SettingsEnvironment.Init(env);
+        }
+
+        private void HideObjects(object sender, RoutedEventArgs e)
+        {
+            DrawingObjectEnumerator does = SelectedObjects;
+            while (does.MoveNext())
+            {
+                DrawingObject dobj = does.Current;
+                if (dobj.GetType() == typeof(Part))
+                {
+                    tsm.ModelObject mobj = new tsm.Model().SelectModelObject((dobj as Part).ModelIdentifier);
+                    tsm.Part part = mobj as tsm.Part;
+
+                    List<string> ids = new List<string>();
+
+                    ids.Add(part.Identifier.GUID.ToString());
+                    tsm.ModelObjectEnumerator childs = part.GetChildren();
+                    while (childs.MoveNext())
+                    {
+                        if (childs.Current is tsm.RebarGroup)
+                        {
+                            ids.Add(childs.Current.Identifier.GUID.ToString());
+                        }
+                    }
+
+                    ArrayList toHide = new ArrayList();
+                    string result = "";
+
+                    DrawingObjectEnumerator viewspart = dobj.GetView().GetAllObjects(typeof(Part));
+                    while(viewspart.MoveNext())
+                    {
+                        if (!ids.Contains((viewspart.Current as Part).ModelIdentifier.GUID.ToString()))
+                        {
+                            toHide.Add(viewspart.Current as DrawingObject);
+                            result += (viewspart.Current as Part).ModelIdentifier.ID + Environment.NewLine;
+                        }
+                    }
+                    //MessageBox.Show(result);
+                    ui.DrawingObjectSelector s = dh.GetDrawingObjectSelector();
+                    s.UnselectAllObjects();
+                    s.SelectObjects(toHide, true);
+                    foreach(var v in toHide)
+                    {
+                       // s.SelectObject(v as DrawingObject);
+                    }
+                    
+                }
+            }
+        }
+
+
+        private void HideObjects_Old()
+        {
+            DrawingObjectEnumerator does = SelectedObjects;
+            while (does.MoveNext())
+            {
+                DrawingObject dobj = does.Current;
+                if (dobj.GetType() == typeof(View))
+                {
+                    View v = dobj as View;
+                    DrawingObjectEnumerator parts = v.GetAllObjects(typeof(Part));
+                    tsg.AABB aABB = v.RestrictionBox;
+                    //MessageBox.Show(aABB.MaxPoint.ToString());
+                    int counter = 0;
+                    //MessageBox.Show(parts.GetSize().ToString());
+                    while (parts.MoveNext())
+                    {
+                        tsm.ModelObject mobj = new tsm.Model().SelectModelObject((parts.Current as Part).ModelIdentifier);
+                        tsg.AABB ab = null;
+                        if (mobj.GetType() == typeof(tsm.Beam))
+                        {
+                            tsm.Part part = mobj as tsm.Part;
+                            ab = GetAABB(part.GetSolid());
+                        }
+                        else if (mobj.GetType() == typeof(tsm.Reinforcement))
+                        {
+                            tsm.RebarGroup rg = mobj as tsm.RebarGroup;
+                            ab = GetAABB(rg.GetSolid());
+                        }
+                        else
+                        {
+                            MessageBox.Show(mobj.GetType().ToString());
+                        }
+                        if (ab != null)
+                        {
+                            //MessageBox.Show("asd");
+                            //if (aABB.IsInside(new tsg.LineSegment(ab.MaxPoint, ab.MinPoint)))
+                            //if (aABB.IsInside(ab.GetCenterPoint()))
+                            //MessageBox.Show(ab.MinPoint.ToString());
+
+                            string result1 = $"{aABB.MaxPoint}:{aABB.MinPoint}";
+                            string result2 = $"{ab.MaxPoint}:{ab.MinPoint}";
+
+                            MessageBox.Show(result1 + Environment.NewLine + result2);
+
+                            if (aABB.IsInside(ab.MinPoint) && aABB.IsInside(ab.MaxPoint))
+                            {
+                                counter++;
+                            }
+                        }
+                    }
+
+                    MessageBox.Show(counter.ToString());
+
+                }
+            }
+        }
+
+        private tsg.AABB GetAABB(tsm.Solid s)
+        {
+            return new tsg.AABB(s.MinimumPoint, s.MaximumPoint);
+        }
+
+        private void BViewName_Click(object sender, RoutedEventArgs e)
+        {
+            DrawingObjectEnumerator does = SelectedObjects;
+            while (does.MoveNext())
+            {
+                DrawingObject dobj = does.Current;
+                if (dobj.GetType() == typeof(View))
+                {
+                    View v = dobj as View;
+                    //v.Name = tViewName.tViewName;
+                    v.Attributes.TagsAttributes.TagA1.TagContent.Clear();
+                    v.Attributes.TagsAttributes.TagA1.TagContent.Add(
+                        new TextElement(tViewName.Text, new FontAttributes(DrawingColors.Green, 5, "GOST 2.304 type A", false, false)));
+                    v.Modify();
+                }
+            }
+            CommitChanges();
+        }
+
+
+        /* Разработал
+         * RUSSIA
+         * USERDEFINED.ru_6_fam_dop USERDEFINED.ru_6_fam
+         * 
+         * Проверил
+         * USERDEFINED.ru_7_fam_dop USERDEFINED.ru_7_fam
+         * 
+         */
     }
 }

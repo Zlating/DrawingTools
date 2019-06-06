@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This file is NOT compatible with Silverlight-->
+<Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
+  <Canvas Name="svg3775" Width="21000" Height="29700">
+    <Canvas.RenderTransform>
+      <TranslateTransform X="0" Y="0"/>
+    </Canvas.RenderTransform>
+    <Canvas.Resources/>
+    <!--Unknown tag: metadata-->
+    <!--Unknown tag: sodipodi:namedview-->
+    <Polygon xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Points="7727.4,12400.94 13899.45,12400.94 13899.45,15829.88 14585.08,15829.88 14585.08,12400.94 16642.36,12400.94 16642.36,11715.31 14585.08,11715.31 14585.08,6229.09 13899.45,6229.09 13899.45,11715.31 7727.4,11715.31 7727.4,6229.09 7041.77,6229.09 7041.77,11715.31 4298.66,11715.31 4298.66,12400.94 7041.77,12400.94 7041.77,15829.88 7727.4,15829.88 " Name="polygon3769" FillRule="EvenOdd" Fill="#FF7F7F7F"/>
+    <Polygon xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Points="11841.97,11029.48 13213.62,11029.48 13213.62,7600.74 11841.97,7600.74 " Name="polygon3771" FillRule="EvenOdd" Fill="#FFFFAEC9"/>
+  </Canvas>
+</Viewbox>

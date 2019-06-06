@@ -1,14 +1,19 @@
-﻿<Window x:Class="DrawingTools.MainWindow"
+﻿<Window x:Class="DrawingTools.UI"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DrawingTools"
-        mc:Ignorable="d"
-        Title="DrawingTools" WindowStyle="ToolWindow" Height="565.238" Width="168.635" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center">
-
-    <Grid>
-
+        xmlns:ui="http://schemas.trimble.com/fusion"
+        Style="{DynamicResource WindowStyle}"
+    Topmost="True" Title="DrawingTools" WindowStyle="ToolWindow"  ResizeMode="NoResize" Width="170" Height="650" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/light.xaml"/>
+                <ResourceDictionary Source="Resources/dark.xaml"/>
+                <ResourceDictionary Source="Resources/icons.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Name="layout" Margin="0,0,0,2">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
@@ -18,15 +23,24 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" >
+            <!-- Выбор среды (пользовательские атрибуты) -->
+            <ComboBox IsEnabled="false" Name="cenv" HorizontalAlignment="Stretch" Margin="5,2.5,5,0" VerticalAlignment="Top" SelectionChanged="Cenv_SelectionChanged" >
+                <ComboBoxItem Name="russia" Content="Russia" IsSelected="true" />
+                <ComboBoxItem Name="steeldetailingru" Content="Steeldetailing.ru" />
+                <ComboBoxItem Name="topengineer" Content="Topengineer" />
+            </ComboBox>
 
-        <!-- Выбор среды (пользовательские атрибуты) -->
-        <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" IsEnabled="false" Margin="5,2.5,5,0" VerticalAlignment="Top">
-            <ComboBoxItem IsSelected="True">SteelDetailing.ru</ComboBoxItem>
-            <ComboBoxItem>Russia</ComboBoxItem>
-            <ComboBoxItem>Topengineer</ComboBoxItem>
-        </ComboBox>
-
+            <!-- <Button Name="Theme" Click="Theme_Click" HorizontalAlignment="Right" Width="30" Height="30" Margin="2.5" /> -->
+        </StackPanel>
         <!-- Смена формата чертежа -->
         <Grid Grid.Row="1" HorizontalAlignment="Stretch" Margin="5,2.5,5,2.5" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
@@ -38,20 +52,20 @@
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <!-- Смена типа формата -->
-            <Button Grid.Column="0" Grid.Row="0" Margin="0,6,0,25" Height="20" Width="20" Content="↑" Name="chUP"  Click="chUP_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            <Button Grid.Column="0" Grid.Row="0" Margin="0,26,0,0" Height="20" Width="20" Content="↓" Name="chDOWN" Click="chDOWN_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Button Grid.Column="0" Grid.Row="0" Margin="0,6,0,25" Height="20" Width="20" Content="{StaticResource arrow.Up}" Name="chUP"  Click="chUP_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Button Grid.Column="0" Grid.Row="0" Margin="0,26,0,0" Height="20" Width="20" Content="{StaticResource arrow.Down}" Name="chDOWN" Click="chDOWN_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             <!-- Функция смены формата -->
             <Button Grid.Column="1" Grid.Row="0" Margin="5,5,5,5"  Name="chOk" Click="ChOk_Click"/>
             <!-- Расширение формата-->
             <StackPanel Margin="5,0,5,0" Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
-                <Button Height="20" Width="20" Content="←" Name="chLEFT" Click="chLEFT_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <Button Margin="5,0,0,0" Height="20" Width="20" Content="→" Name="chRIGHT" Click="chRIGHT_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <Button Margin="5,0,0,0" Height="20" Width="20" Content="↻" Name="chREVERSE" Click="chREVERSE_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Button Height="20" Width="20"  Name="chLEFT" Content="{StaticResource arrow.Left}" Click="chLEFT_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Button Margin="5,0,0,0" Height="20" Width="20" Content="{StaticResource arrow.Right}" Name="chRIGHT" Click="chRIGHT_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Button Margin="5,0,0,0" Height="20" Width="20" Content="{StaticResource Circle.Arrow}" Name="chREVERSE" Click="chREVERSE_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </StackPanel>
         </Grid>
 
         <!-- Операции с размерами -->
-        <Grid Grid.Row="2" HorizontalAlignment="Stretch"  Margin="0,0,0,0" VerticalAlignment="Top">
+        <Grid Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*"/>
@@ -66,18 +80,10 @@
             </Grid.RowDefinitions>
 
             <!-- Тип размера -->
-            <Button Grid.Column="0" Grid.Row="0" Height="30" Width="30" Name="dimRelative" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimRelative_Click">
-                <Image Source="Resources/bRELATIVE.bmp" />
-            </Button>
-            <Button Grid.Column="1" Grid.Row="0" Height="30" Width="30" Name="dimABSOLUTE" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimABSOLUTE_Click">
-                <Image Source="Resources/bABSOLUTE.bmp" />
-            </Button>
-            <Button Grid.Column="2" Grid.Row="0" Height="30" Width="30" Name="dimMIXED" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimMIXED_Click">
-                <Image Source="Resources/bMixed.bmp"  />
-            </Button>
-            <Button Grid.Column="3" Grid.Row="0" Height="30" Width="30" Name="dimInsideDimension" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimInsideDimension_Click">
-                <Image Source="Resources/bInsideDimension.bmp"  />
-            </Button>
+            <Button Grid.Column="0" Grid.Row="0" Content="{StaticResource dimension.Relative}" Height="30" Width="30" Name="dimRelative" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimRelative_Click" />
+            <Button Grid.Column="1" Grid.Row="0" Content="{StaticResource dimension.Absolute}" Height="30" Width="30" Name="dimABSOLUTE" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimABSOLUTE_Click" />
+            <Button Grid.Column="2" Grid.Row="0" Content="{StaticResource dimension.Mixed}" Height="30" Width="30" Name="dimMIXED" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimMIXED_Click" />
+            <Button Grid.Column="3" Grid.Row="0" Content="{StaticResource dimension.Inside}" Height="30" Width="30" Name="dimInsideDimension" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimInsideDimension_Click" />
             <!-- Точность размера -->
             <Button Grid.Column="0" Grid.Row="1" Height="30" Margin="0,2.5,0,2.5" Width="30" Name="dimAccuracy1" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DimAccuracy1_Click">
                 <Image Source="Resources/bACC_1.bmp" />
@@ -119,9 +125,8 @@
             </Button>
         </Grid>
 
-
         <!-- Префикс\Постфикс размеров -->
-        <Grid Grid.Row="3" HorizontalAlignment="Stretch" Margin="5,2.5,5,2.5" VerticalAlignment="Top">
+        <Grid Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*"/>
@@ -132,30 +137,23 @@
             </Grid.RowDefinitions>
 
             <TextBox Grid.Column="0" Grid.Row="0" Margin="2.5, 2.5, 2.5, 2.5" Name="tPrefix" Height="25" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontStretch="UltraExpanded" KeyUp="TPrefix_KeyUp">
-                d@
+                xsteel@0
             </TextBox>
             <Button Grid.Column="1" Grid.Row="0" Margin="2.5, 2.5, 2.5, 2.5" Content="Префикс" Name="bPrefix" Click="BPrefix_Click"/>
             <TextBox Grid.Column="0" Grid.Row="1" Margin="2.5, 2.5, 2.5, 2.5" Name="tPostfix" Height="25" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontStretch="UltraExpanded" KeyUp="TPostfix_KeyUp">
-                *
+                +1/-1
             </TextBox>
             <Button Grid.Column="1" Grid.Row="1" Margin="2.5, 2.5, 2.5, 2.5" Content="Постфикс" Name="bPostifx" Click="BPostifx_Click"/>
         </Grid>
         <!-- Масштаб вида -->
-        <Grid Grid.Row="4" HorizontalAlignment="Stretch" Margin="2.5" VerticalAlignment="Top">
+        <Grid Grid.Row="4" HorizontalAlignment="Stretch" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.85*" />
+                <ColumnDefinition Width="0.75*" />
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <!--<Slider Grid.Column="0" Name="bSlider" HorizontalAlignment="Stretch"  Value="5" Minimum="1" Maximum="25" Margin="5" VerticalAlignment="Center" ValueChanged="BSlider_ValueChanged" />
-            -->
-            <Button Grid.Column="1" Margin="5" Height="40" Name="bScale" Content="М 1:5" Click="BScale_Click"/>
-            <Slider Grid.Column="0" Margin="5" Name="bScaleSlider" Minimum="1" Maximum="26"  SmallChange="1" LargeChange="5"
-                    TickPlacement="BottomRight" TickFrequency="5"
-                    HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                    ValueChanged="BSlider_ValueChanged" 
-                    MouseWheel="BScaleSlider_MouseWheel"
-                    />
-            
+            <Button Grid.Column="1" Margin="2.5,0,2.5,0"  Name="bScale" Content="М 1:5" Click="BScale_Click"  />
+            <TextBox Grid.Column="0" Margin="2.5" Name="bScaleText" Text="5" TextChanged="BScaleText_TextChanged" KeyUp="BScaleText_KeyUp" VerticalAlignment="Center" />
+
         </Grid>
         <!-- Усечение вида -->
         <Grid Grid.Row="5" HorizontalAlignment="Stretch" Margin="2.5" VerticalAlignment="Top">
@@ -211,7 +209,44 @@
                 </Button>
             </StackPanel>
         </Grid>
-
-        <Button Content="test" Click="Button_Click" />
+        <!-- Разрезы -->
+        <Grid Grid.Row="8" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBox Grid.Column="0" Grid.Row="0" Margin="2.5, 2.5, 2.5, 2.5" Name="tSectionText" Height="25" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontStretch="UltraExpanded" >
+                по А
+            </TextBox>
+            <Button Grid.Column="1" Grid.Row="0" Margin="2.5, 2.5, 2.5, 2.5" Height="30"  Name="bSectionText" Click="BSectionText_Click" >
+                <Image Source="Resources/bSECTION_X_note.bmp" />
+            </Button>
+        </Grid>
+        <!-- Глубина вида HIDE -->
+        <Grid Grid.Row="9" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Margin="2.5, 2.5, 2.5, 2.5" Name="tLevelHigh" Height="25" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontStretch="UltraExpanded">
+                100/100
+            </TextBox>
+            <Button Grid.Column="1" Margin="2.5, 2.5, 2.5, 2.5" Height="30" Name="bLevelHigh" Content="Глубина" Click="BLevelHigh_Click" />
+        </Grid>
+        <Grid Grid.Row="10" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Margin="2.5, 2.5, 2.5, 2.5" Name="tViewName" Height="25" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontStretch="UltraExpanded">
+                Имя вида
+            </TextBox>
+            <Button Grid.Column="1" Margin="2.5, 2.5, 2.5, 2.5" Height="30" Name="bViewName" Content="Имя вида" Click="BViewName_Click" />
+        </Grid>
+        <Button Grid.Row="11" Content="{DynamicResource accuracy.One}" Height="60" Width="60" Click="HideObjects" />
     </Grid>
 </Window>

@@ -63,16 +63,6 @@ namespace DrawingTools.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap bABSOLUTE {
-            get {
-                object obj = ResourceManager.GetObject("bABSOLUTE", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap bACC_0_001 {
             get {
                 object obj = ResourceManager.GetObject("bACC_0_001", resourceCulture);
@@ -183,36 +173,6 @@ namespace DrawingTools.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap bInsideDimension {
-            get {
-                object obj = ResourceManager.GetObject("bInsideDimension", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap bMIXED {
-            get {
-                object obj = ResourceManager.GetObject("bMIXED", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap bNEXT {
-            get {
-                object obj = ResourceManager.GetObject("bNEXT", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap bPart_c_line {
             get {
                 object obj = ResourceManager.GetObject("bPart_c_line", resourceCulture);
@@ -236,26 +196,6 @@ namespace DrawingTools.Properties {
         internal static System.Drawing.Bitmap bPart_c_line2 {
             get {
                 object obj = ResourceManager.GetObject("bPart_c_line2", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap bPREV {
-            get {
-                object obj = ResourceManager.GetObject("bPREV", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap bRELATIVE {
-            get {
-                object obj = ResourceManager.GetObject("bRELATIVE", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -356,46 +296,6 @@ namespace DrawingTools.Properties {
         internal static System.Drawing.Bitmap bWELD_none {
             get {
                 object obj = ResourceManager.GetObject("bWELD_none", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ChangeFormat {
-            get {
-                object obj = ResourceManager.GetObject("ChangeFormat", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ChangeFormat_big {
-            get {
-                object obj = ResourceManager.GetObject("ChangeFormat_big", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap DrawingWeld_17 {
-            get {
-                object obj = ResourceManager.GetObject("DrawingWeld_17", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap DrawingWeld_17_big {
-            get {
-                object obj = ResourceManager.GetObject("DrawingWeld_17_big", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

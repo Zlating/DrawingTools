@@ -1,0 +1,128 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:DrawingTools.Properties">
+
+
+    <Path x:Key="accuracy.One" Stretch="Uniform" Stroke="Black" Fill="Black">
+        <Path.Data>
+            <GeometryGroup>
+                <LineGeometry StartPoint="1,10" EndPoint="1,5" />
+                <LineGeometry StartPoint="6,10" EndPoint="6,5" />
+                <LineGeometry StartPoint="11,10" EndPoint="11,5" />
+                <LineGeometry StartPoint="0,7" EndPoint="12,7" />
+                <RectangleGeometry Rect="7,5,3,1" />
+                <RectangleGeometry Rect="2,5,3,1" />
+            </GeometryGroup>
+        </Path.Data>
+    </Path>
+
+
+    <Path x:Key="dimension.Inside" Stretch="Uniform" Stroke="Black" Fill="Black">
+        <Path.Data>
+            <GeometryGroup>
+                <LineGeometry StartPoint="1,10" EndPoint="1,5" />
+                <LineGeometry StartPoint="6,10" EndPoint="6,5" />
+                <LineGeometry StartPoint="11,10" EndPoint="11,5" />
+                <LineGeometry StartPoint="0,7" EndPoint="12,7" />
+                <RectangleGeometry Rect="7,5,3,1" />
+                <RectangleGeometry Rect="2,5,3,1" />
+            </GeometryGroup>
+        </Path.Data>
+    </Path>
+
+    <Path x:Key="dimension.Mixed" Stretch="Uniform" Stroke="Black" Fill="Black">
+        <Path.Data>
+            <GeometryGroup>
+                <LineGeometry StartPoint="2,10" EndPoint="2,2" />
+                <LineGeometry StartPoint="8,10" EndPoint="8,2" />
+                <LineGeometry StartPoint="0,7" EndPoint="10,7" />
+                <RectangleGeometry Rect="6,2,1,4"  />
+                <RectangleGeometry Rect="3,5,2,1"  />
+            </GeometryGroup>
+        </Path.Data>
+    </Path>
+
+    <Path x:Key="dimension.Absolute" Stretch="Uniform" Stroke="Gray" Fill="Gray">
+        <Path.Data>
+            <GeometryGroup>
+                <LineGeometry StartPoint="2,10" EndPoint="2,2" />
+                <LineGeometry StartPoint="8,10" EndPoint="8,2" />
+                <LineGeometry StartPoint="0,7" EndPoint="10,7" />
+                <RectangleGeometry Rect="6,2,1,4"  />
+            </GeometryGroup>
+        </Path.Data>
+    </Path>
+
+    <Path x:Key="dimension.Relative" Stretch="Uniform" Stroke="Black" Fill="Black">
+        <Path.Data>
+            <GeometryGroup>
+                <LineGeometry StartPoint="2,10" EndPoint="2,5" />
+                <LineGeometry StartPoint="8,10" EndPoint="8,5" />
+                <LineGeometry StartPoint="0,7" EndPoint="10,7" />
+                <RectangleGeometry Rect="3,4,4,1"  />
+            </GeometryGroup>
+        </Path.Data>
+    </Path>
+    
+
+    <Path x:Key="Figure.Triangle" Stretch="Uniform" Stroke="Black">
+        <Path.Data>
+            <GeometryGroup>
+                <LineGeometry StartPoint="0,10" EndPoint="10,10" />
+                <LineGeometry StartPoint="10,10" EndPoint="10,0" />
+                <LineGeometry StartPoint="0,10" EndPoint="10,0" />
+            </GeometryGroup>
+        </Path.Data>
+    </Path>
+
+    <Path x:Key="Circle.Arrow" Stretch="Fill" Stroke="Black" >
+        <Path.Data>
+            <GeometryGroup>
+                <LineGeometry StartPoint="0,1" EndPoint="15,0" />
+                <LineGeometry StartPoint="15,0" EndPoint="14,15" />
+                <EllipseGeometry Center="15,15" RadiusX="15" RadiusY="15" />
+            </GeometryGroup>
+        </Path.Data>
+    </Path>
+
+    <Path x:Key="arrow.Left" Stretch="Fill" Fill="Black" Stroke="Black" >
+        <Path.Data>
+            <GeometryGroup>
+                <LineGeometry StartPoint="0,10" EndPoint="5,0" />
+                <LineGeometry StartPoint="0,10" EndPoint="10,10" />
+                <LineGeometry StartPoint="0,10" EndPoint="5,20" />
+            </GeometryGroup>
+        </Path.Data>
+    </Path>
+
+    <Path x:Key="arrow.Right" Stretch="Fill" Fill="Black" Stroke="Black" >
+        <Path.Data>
+            <GeometryGroup>
+                <LineGeometry StartPoint="10,10" EndPoint="5,0" />
+                <LineGeometry StartPoint="0,10" EndPoint="10,10" />
+                <LineGeometry StartPoint="10,10" EndPoint="5,20" />
+            </GeometryGroup>
+        </Path.Data>
+    </Path>
+
+    <Path x:Key="arrow.Up" Stretch="Fill" Fill="Black" Stroke="Black" >
+        <Path.Data>
+            <GeometryGroup>
+                <LineGeometry StartPoint="5,0" EndPoint="0,5" />
+                <LineGeometry StartPoint="5,10" EndPoint="5,0" />
+                <LineGeometry StartPoint="5,0" EndPoint="10,5" />
+            </GeometryGroup>
+        </Path.Data>
+    </Path>
+
+    <Path x:Key="arrow.Down" Stretch="Fill" Stroke="Black" >
+        <Path.Data>
+            <GeometryGroup>
+                <LineGeometry StartPoint="5,10" EndPoint="0,5" />
+                <LineGeometry StartPoint="5,10" EndPoint="5,0" />
+                <LineGeometry StartPoint="5,10" EndPoint="10,5" />
+            </GeometryGroup>
+        </Path.Data>
+    </Path>
+
+</ResourceDictionary>
